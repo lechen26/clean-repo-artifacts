@@ -1,26 +1,27 @@
 #!/bin/sh
-REPO=$1
-EXCLUDE=$2
+EXCLUDE="'$*'"
 
 if [ -z ${GITHUB_TOKEN} ];then
   echo "set GITHUB_TOKEN"
-  exit -1
+  exit 1
 fi
 
-if [ -z ${REPO} ];then
+if [ -z ${GITHUB_REPO} ];then
   echo "Repository must be set"
-  exit -1
+  exit 1
 fi
 
 # Gets all artifacts except the ones we should exclude
-if [ -z ${EXCLUDE} ];then
-    artifacts=`curl -H "Authorization: token ${TOKEN}" "https://api.github.com/repos/Segasec/${REPO}/actions/artifacts" |jq '.artifacts[].id'`
+if [ -z "${EXCLUDE}" ];then
+  echo "Get all artifacts from repo ${GITHUB_REPO}"
+  artifacts=`curl -H "Authorization: token ${GITHUB_TOKEN}" "https://api.github.com/repos/${GITHUB_REPO}/actions/artifacts" |jq '.artifacts[].id'`
 else
-    artifacts=`curl -H "Authorization: token ${TOKEN}" "https://api.github.com/repos/Segasec/${REPO}/actions/artifacts" |jq '.artifacts[] | select(.name != "${EXCLUDE}").id'`
+  echo "Get all artifacts from repo ${GITHUB_REPO} except ${EXCLUDE}"
+  artifacts=`curl -H "Authorization: token ${GITHUB_TOKEN}" "https://api.github.com/repos/${GITHUB_REPO}/actions/artifacts" |jq '.artifacts[] | select(.name != "${EXCLUDE}").id'`
 fi
 
 # Delete all found artifacts
-#for artifact in $artifacts;
-#do
-#	curl -H "Authorization: token ${TOKEN}" -X DELETE "https://api.github.com/repos/Segasec/${REPO}/actions/artifacts/$artifact"
-#done
+for artifact in $artifacts;
+do
+  curl -H "Authorization: token ${GITHUB_TOKEN}" -X DELETE "https://api.github.com/repos/${GITHUB_REPO}/actions/artifacts/$artifact"
+done
