@@ -1,4 +1,4 @@
-FROM curlimages/curl
+FROM dwdraju/alpine-curl-jq
 
 COPY entrypoint.sh /entrypoint.sh
 
