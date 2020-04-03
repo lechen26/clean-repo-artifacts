@@ -1,0 +1,16 @@
+# action.yml
+name: 'Clean Repo Artifacts'
+description: 'Clean Repository artifacts from all previous runs'
+inputs:
+  repo:
+    description: 'the Github repository'
+    required: true
+  exclude:
+    description: 'File pattern to exclude'
+    required: false
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.repo }}
+    - ${{ inputs.exclude }}
