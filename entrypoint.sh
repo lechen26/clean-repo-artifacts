@@ -1,5 +1,5 @@
 #!/bin/sh
-EXCLUDE="'$*'"
+EXCLUDE=$1
 
 if [ -z ${GITHUB_TOKEN} ];then
   echo "set GITHUB_TOKEN"
@@ -17,7 +17,7 @@ if [ -z "${EXCLUDE}" ];then
   artifacts=`curl -H "Authorization: token ${GITHUB_TOKEN}" "https://api.github.com/repos/${GITHUB_REPO}/actions/artifacts" |jq '.artifacts[].id'`
 else
   echo "Get all artifacts from repo ${GITHUB_REPO} except ${EXCLUDE}"
-  artifacts=`curl -H "Authorization: token ${GITHUB_TOKEN}" "https://api.github.com/repos/${GITHUB_REPO}/actions/artifacts" |jq '.artifacts[] | select(.name != "${EXCLUDE}").id'`
+  artifacts=`curl -s -H "Authorization: token ${GITHUB_TOKEN}" "https://api.github.com/repos/${GITHUB_REPO}/actions/artifacts" |jq --arg exclude "${EXCLUDE}" '.artifacts[] | select(.name as $n | $exclude |index($n) | not).id'`
 fi
 
 # Delete all found artifacts
