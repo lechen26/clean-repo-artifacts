@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v2     
       - uses: cleanRepoArtifacts
         with:
-          exclude: "HTML Test report"
+          exclude: '["HTML Test report","HTML integration report"]'
         env: 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPO: ${{ github.repository }}
